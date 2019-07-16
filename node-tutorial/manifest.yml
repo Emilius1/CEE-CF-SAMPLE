@@ -1,0 +1,23 @@
+---
+applications:
+- name: myapp
+  host: cee-nodejs-app-1
+  path: myapp
+  memory: 128M
+  services:
+    - myuaa
+- name: web
+  host: cee-web-ar
+  path: web
+  memory: 128M
+  env:
+    destinations: >
+      [
+        {
+          "name":"myapp",
+          "url":"https://cee-nodejs-app-1.cfapps.sap.hana.ondemand.com",
+          "forwardAuthToken": true
+        }
+      ]
+  services:
+    - myuaa
