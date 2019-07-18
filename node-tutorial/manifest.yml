@@ -4,8 +4,10 @@ applications:
   host: cee-nodejs-app-1
   path: myapp
   memory: 128M
+  buildpack: nodejs_buildpack
   services:
     - myuaa
+    - myhana
 - name: web
   host: cee-web-ar
   path: web

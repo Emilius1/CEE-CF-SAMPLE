@@ -3,17 +3,18 @@ const passport = require('passport');
 const bodyParser = require('body-parser');
 const xsenv = require('@sap/xsenv');
 const JWTStrategy = require('@sap/xssec').JWTStrategy;
-
+const hdbext = require('@sap/hdbext');
 const users = require('./users.json');
 const app = express();
 
-const services = xsenv.getServices({ uaa: 'myuaa' });
+const services = xsenv.getServices({ uaa: 'myuaa', hana:'myhana' });
 
 passport.use(new JWTStrategy(services.uaa));
 
 app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(passport.authenticate('JWT', { session: false }));
+app.use('/', hdbext.middleware(services.hana));
 
 app.get('/users', function (req, res) {
   var isAuthorized = req.authInfo.checkScope('$XSAPPNAME.Display');
@@ -36,6 +37,18 @@ app.post('/users', function (req, res) {
   users.push(newUser);
 
   res.status(201).json(newUser);
+});
+
+app.get('/dbtest', function (req, res) {
+  var isAuthorized = req.authInfo.checkScope('$XSAPPNAME.Display');
+  if (isAuthorized) {
+    req.db.exec('SELECT CURRENT_UTCTIMESTAMP FROM DUMMY', function (err, rows) {
+      if (err) { return next(err); }
+      res.send('Current HANA time (UTC): ' + rows[0].CURRENT_UTCTIMESTAMP);
+    })
+  } else {
+    res.status(403).send('Forbidden');
+  }
 });
 
 const port = process.env.PORT || 3000;

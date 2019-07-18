@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@sap/hdbext": "^6.0.1",
     "@sap/xssec": "^2.2.2",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
